@@ -1,3 +1,6 @@
+console.log(typeof expect);  //Should print "function"
+
+
 const request = require('supertest');
 const { app, resetData } = require('../app');
 const expect = require('expect');
