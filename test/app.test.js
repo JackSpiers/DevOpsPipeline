@@ -1,23 +1,24 @@
-
 const request = require('supertest');
-const app     = require('../app');
-const expect  = require('expect');
+const { app, resetData } = require('../app');
+const expect = require('expect');
 
 describe('Express App Endpoints', () => {
-  //Test root endpoint
+  //Reset the in-memory data before each test so tests don't affect each other
+  beforeEach(() => {
+    resetData();
+  });
+
   it('GET / should respond with Hello, Jenkins Pipeline!', async () => {
     const res = await request(app).get('/');
     expect(res.text).toBe('Hello, Jenkins Pipeline!');
   });
 
-  //Test health endpoint
   it('GET /health should respond 200 OK', async () => {
     const res = await request(app).get('/health');
     expect(res.status).toBe(200);
     expect(res.text).toBe('OK');
   });
 
-  //Test CRUD: start fresh
   it('GET /api/items should return [] initially', async () => {
     const res = await request(app).get('/api/items');
     expect(res.status).toBe(200);
@@ -34,6 +35,10 @@ describe('Express App Endpoints', () => {
   });
 
   it('PUT /api/items/1 should update the item', async () => {
+    //First create the item
+    await request(app).post('/api/items').send({ name: 'TestItem' });
+
+    //Then update it
     const res = await request(app)
       .put('/api/items/1')
       .send({ name: 'UpdatedItem' });
@@ -42,8 +47,14 @@ describe('Express App Endpoints', () => {
   });
 
   it('DELETE /api/items/1 should delete the item', async () => {
+    //First create the item
+    await request(app).post('/api/items').send({ name: 'TestItem' });
+
+    //Then delete it
     const res = await request(app).delete('/api/items/1');
     expect(res.status).toBe(204);
+
+    //Check the item is gone
     const getRes = await request(app).get('/api/items');
     expect(getRes.body.find(i => i.id === 1)).toBeUndefined();
   });
