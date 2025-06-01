@@ -4,7 +4,7 @@
   "description": "Simple task manager app",
   "main": "src/app.js",
   "scripts": {
-    "start": "node src/app.js",
+    "start": "node src/start.js",
     "build": "echo 'No build step needed yet'",
     "test": "jest"
   },
