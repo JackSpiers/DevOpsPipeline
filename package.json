@@ -1,17 +1,14 @@
 {
-  "name": "devops-app",
+  "name": "task-manager",
   "version": "1.0.0",
-  "description": "Node.js app for Devops Jenkins pipeline",
-  "main": "app.js",
+  "description": "Simple task manager app",
+  "main": "src/app.js",
   "scripts": {
-    "test": "jest --ci --reporters=default --reporters=jest-junit"
+    "start": "node src/app.js",
+    "build": "echo 'No build step needed yet'",
+    "test": "echo 'No tests yet'"
   },
   "dependencies": {
     "express": "^4.18.2"
-  },
-  "devDependencies": {
-    "jest": "^29.5.0",
-    "jest-junit": "^13.0.0",
-    "supertest": "^6.3.3"
   }
 }
