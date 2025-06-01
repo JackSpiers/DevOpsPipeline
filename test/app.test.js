@@ -1,9 +1,8 @@
-console.log(typeof expect);  //Should print "function"
-
 
 const request = require('supertest');
 const { app, resetData } = require('../app');
 const expect = require('expect');
+console.log(typeof expect);  //Should print "function"
 
 describe('Express App Endpoints', () => {
   //Reset the in-memory data before each test so tests don't affect each other
