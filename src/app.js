@@ -47,5 +47,20 @@ app.delete('/tasks/:id', (req, res) => {
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'UP' });
 });
+app.get('/health', (req, res) => res.status(200).send('OK'));
+
+
+app.get('/metrics', (req, res) => {
+  const memoryUsage = process.memoryUsage();
+  res.json({
+    uptime: process.uptime(),
+    memory: {
+      rss: memoryUsage.rss,
+      heapUsed: memoryUsage.heapUsed,
+    },
+    status: 'ok'
+  });
+});
+
 
 module.exports = app;
