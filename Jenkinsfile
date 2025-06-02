@@ -70,6 +70,37 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy') {
+            steps {
+                echo 'Building Docker image and running container as a test deployment…'
+                script {
+                    bat """
+                      docker build -t task-manager:${BUILD_NUMBER} .
+                    """
+
+                    bat """
+                      powershell -Command "if (docker ps -q --filter \"name=task-manager-test\") {
+                                            docker stop task-manager-test
+                                            docker rm  task-manager-test
+                                          }"
+                    """
+
+                    bat """
+                      docker run -d ^
+                        --name task-manager-test ^
+                        -p 3000:3000 ^
+                        task-manager:${BUILD_NUMBER}
+                    """
+
+                    bat """
+                      ping 127.0.0.1 -n 5 >nul
+                      curl -f http://localhost:3000/tasks || exit 1
+                    """
+                }
+            }
+        }
+        
     }
 }
 
