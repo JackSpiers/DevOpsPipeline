@@ -36,7 +36,6 @@ pipeline {
                 withSonarQubeEnv('SonarCloud') {
                     withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
                         bat 'curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-windows.zip'
-                        bat 'powershell -Command "Expand-Archive sonar-scanner.zip -DestinationPath . -Force"'
                         bat 'powershell -Command "Expand-Archive sonar-scanner.zip -DestinationPath ."'
                         bat 'set PATH=%CD%\\sonar-scanner-5.0.1.3006-windows\\bin;%PATH% && sonar-scanner.bat -D"sonar.login=%SONAR_TOKEN%"'
                     }
