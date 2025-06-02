@@ -5,6 +5,8 @@ pipeline {
         SONAR_TOKEN = credentials('SONAR_TOKEN')
         DOCKERHUB_CRED    = 'dockerhub-creds'
         MONITOR_RECIPIENT = 'jack.spiers00@gmail.com' 
+        DD_APIKEY = 'API_KEYDD'
+        DD_APPKEY = 'DDAPPKEY
     }
 
     stages {
@@ -107,30 +109,40 @@ pipeline {
             }
         }
 
-        stage('Monitoring') {
+        stage('Monitoring & Alerting') {
             steps {
-                echo 'Running health check against http://localhost:3000/health ...'
+                echo 'Verifying /health status endpoint before notifying Datadog...'
                 bat '''
                 curl -s -o nul -w "%{http_code}" http://localhost:3000/health | findstr 200 > nul
                 if errorlevel 1 exit 1
                 '''
             }
             post {
-                failure {
-                    echo "Health check FAILED – sending alert e-mail to ${env.MONITOR_RECIPIENT}"
-                    emailext(
-                        to: "${env.MONITOR_RECIPIENT}",
-                        subject: "ALERT: Task Manager health check failed at Build #${env.BUILD_NUMBER}",
-                        body: """\
-                        <p><b>Health check failure</b></p>
-                        <p>The pipeline’s Monitoring stage detected that <code>http://localhost:3000/health</code> returned a non-200 status.</p>
-                        <p>Build: <a href="${env.BUILD_URL}">${env.JOB_NAME} #${env.BUILD_NUMBER}</a></p>
-                        <p>Please investigate the container logs for more details.</p>
-                        """
-                    )
-                }
                 success {
-                    echo "Health check passed."
+                    echo 'Sending deployment success event to Datadog'
+                    script {
+                        def payload = """
+                        {
+                          "title": "Successful Deployment",
+                          "text": "Task Manager deployed successfully at build #${BUILD_NUMBER}.",
+                          "priority": "normal",
+                          "tags": ["env:production", "app:task-manager"],
+                          "alert_type": "success"
+                        }
+                        """
+                        writeFile file: 'dd_event.json', text: payload
+                        bat """
+                          curl -X POST ^
+                            -H "Content-type: application/json" ^
+                            -H "DD_APIKEY: ${env.DATADOG_API_KEY}" ^
+                            -H "DD_KEY: ${env.DATADOG_APP_KEY}" ^
+                            -d @dd_event.json ^
+                            "https://api.datadoghq.com/api/v1/events"
+                        """
+                    }
+                }
+                failure {
+                    echo "Health check failed — no Datadog notification sent."
                 }
             }
         }
