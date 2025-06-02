@@ -82,5 +82,28 @@ pipeline {
             }
         }
 
+        stage('Release') {
+            steps {
+                echo 'Tagging and pushing Docker image to Docker Hub…'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PW'
+                )]) {
+                    script {
+                        bat "docker login -u %DOCKER_USER% -p %DOCKER_PW%"
+        
+
+                        bat "docker tag task-manager:${BUILD_NUMBER} %DOCKER_USER%/task-manager:${BUILD_NUMBER}"
+
+                        bat "docker tag task-manager:${BUILD_NUMBER} %DOCKER_USER%/task-manager:latest"
+        
+                        bat "docker push %DOCKER_USER%/task-manager:${BUILD_NUMBER}"
+                        bat "docker push %DOCKER_USER%/task-manager:latest"
+                    }
+                }
+            }
+        }
+
     }
 }
