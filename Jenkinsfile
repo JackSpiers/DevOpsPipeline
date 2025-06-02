@@ -30,11 +30,13 @@ pipeline {
 
         stage('SonarCloud Analysis') {
             steps {
-                withSonarQubeEnv(SONARQUBE_ENV) {
-                    bat "sonar-scanner -Dsonar.login=${SONAR_TOKEN}"
+                withSonarQubeEnv('SonarCloud') {
+                    def scannerHome = tool 'SonarScanner'  
+                    bat "${scannerHome}\\bin\\sonar-scanner.bat"
                 }
             }
         }
+
 
         stage('Quality Gate') {
             steps {
