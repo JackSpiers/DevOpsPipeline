@@ -111,13 +111,17 @@ pipeline {
         }
 
         stage('Monitoring & Alerting') {
+            when {
+                expression {
+                    return currentBuild.currentResult == 'SUCCESS' || currentBuild.currentResult == 'UNSTABLE' || currentBuild.currentResult == 'FAILURE'
+                }
+            }
             steps {
                 echo 'Verifying /health status endpoint before notifying Datadog...'
                 bat '''
-                curl -s -o nul -w "%{http_code}" http://localhost:3000/health | findstr 200 > nul
+                curl -s -o nul -w "%%{http_code}" http://localhost:3000/health | findstr 200 > nul
                 if errorlevel 1 exit 1
                 '''
-
             }
             post {
                 success {
@@ -125,14 +129,15 @@ pipeline {
                     script {
                         def payload = """
                         {
-                          "title": "Successful Deployment",
-                          "text": "Task Manager deployed successfully at build #${BUILD_NUMBER}.",
+                          "title": "Task Manager successfully deployed",
+                          "text": "Deployment succeeded for build #${env.BUILD_NUMBER} of Task Manager.",
                           "priority": "normal",
                           "tags": ["env:production", "app:task-manager"],
                           "alert_type": "success"
                         }
                         """
                         writeFile file: 'dd_event.json', text: payload
+
                         bat """
                           curl -X POST ^
                             -H "Content-type: application/json" ^
@@ -144,11 +149,12 @@ pipeline {
                     }
                 }
                 failure {
-                    echo "Health check failed — no Datadog notification sent."
+                    echo "Health check failed — not notifying Datadog."
                 }
             }
         }
     }
+
     post {
         always {
             echo "Cleaning up Docker container if it’s still running..."
