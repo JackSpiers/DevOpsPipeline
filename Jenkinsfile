@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SONARQUBE_ENV = 'SonarQube Scanner for Jenkins' 
+        SONARQUBE_ENV = 'SonarScanner' 
         SONAR_TOKEN = credentials('SONAR_TOKEN')
     }
     
