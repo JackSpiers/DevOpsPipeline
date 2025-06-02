@@ -31,7 +31,7 @@ pipeline {
             }
         }
 
-        stage('SonarCloud Analysis') {
+        stage('Code Quality SonarCloud Analysis') {
             steps {
                 withSonarQubeEnv('SonarCloud') {
                     withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
