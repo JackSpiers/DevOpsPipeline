@@ -28,7 +28,7 @@ pipeline {
 
         stage('SonarCloud Analysis') {
           steps {
-            with SonarQubeEnv('SonarCloud'){
+            withSonarQubeEnv('SonarCloud'){
                 withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
                   bat '''
                     curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-windows.zip
