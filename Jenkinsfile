@@ -65,7 +65,10 @@ pipeline {
                 script {
                     bat "docker build -t task-manager:${BUILD_NUMBER} ."
 
-                    bat 'powershell -Command "if (docker ps -q --filter \\"name=task-manager-test\\") { docker stop task-manager-test; docker rm task-manager-test }"'
+                    // ✅ Updated to remove container whether it's running or not
+                    bat """
+                    powershell -Command "if (docker ps -a -q --filter 'name=task-manager-test') { docker rm -f task-manager-test }"
+                    """
 
                     bat """
                       docker run -d ^
@@ -79,5 +82,6 @@ pipeline {
                 }
             }
         }
+
     }
 }
