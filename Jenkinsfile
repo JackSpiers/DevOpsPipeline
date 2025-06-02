@@ -134,12 +134,11 @@ pipeline {
                 }
             }
         }
-
+    }
     post {
         always {
             echo "Cleaning up Docker container if it’s still running..."
             bat "docker rm -f task-manager-test || exit 0"
         }
-    }
     }
 }
