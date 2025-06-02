@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        SONARQUBE_ENV = 'SonarCloud' 
+        SONAR_TOKEN = credentials('SONAR_TOKEN')
+    }
+    
     stages {
         stage('Checkout') {
             steps {
