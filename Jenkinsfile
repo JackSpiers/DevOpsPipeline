@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         SONAR_TOKEN = credentials('SONAR_TOKEN')
+        DOCKERHUB_CRED    = 'dockerhub-creds'
+        MONITOR_RECIPIENT = 'jack.spiers00@gmail.com' 
     }
 
     stages {
