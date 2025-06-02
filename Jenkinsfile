@@ -31,7 +31,7 @@ pipeline {
                 withSonarQubeEnv('SonarCloud') {
                     script {
                         def scannerHome = tool 'SonarScanner'
-                        bat "${scannerHome}\\bin\\sonar-scanner.bat"
+                        bat "\"${scannerHome}\\bin\\sonar-scanner.bat\""
                     }
                 }
             }
