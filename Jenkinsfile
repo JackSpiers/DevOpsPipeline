@@ -6,7 +6,7 @@ pipeline {
         DOCKERHUB_CRED    = 'dockerhub-creds'
         MONITOR_RECIPIENT = 'jack.spiers00@gmail.com' 
         DD_APIKEY = 'API_KEYDD'
-        DD_APPKEY = 'DDAPPKEY
+        DD_APPKEY = 'DDAPPKEY'
     }
 
     stages {
