@@ -2,10 +2,9 @@ pipeline {
     agent any
 
     environment {
-        SONARQUBE_ENV = 'SonarScanner' 
         SONAR_TOKEN = credentials('SONAR_TOKEN')
     }
-    
+
     stages {
         stage('Checkout') {
             steps {
@@ -17,7 +16,6 @@ pipeline {
             steps {
                 echo 'Installing dependencies...'
                 bat 'npm install'
-                echo 'Build complete.'
             }
         }
 
@@ -31,12 +29,11 @@ pipeline {
         stage('SonarCloud Analysis') {
             steps {
                 withSonarQubeEnv('SonarCloud') {
-                    def scannerHome = tool 'SonarScanner'  
+                    def scannerHome = tool 'SonarScanner'
                     bat "${scannerHome}\\bin\\sonar-scanner.bat"
                 }
             }
         }
-
 
         stage('Quality Gate') {
             steps {
@@ -47,4 +44,5 @@ pipeline {
         }
     }
 }
+
 
