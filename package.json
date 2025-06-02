@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/start.js",
     "build": "echo 'No build step needed yet'",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "dependencies": {
     "express": "^5.1.0"
