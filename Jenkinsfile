@@ -11,7 +11,6 @@ pipeline {
                 checkout scm
             }
         }
-    }
 
         stage('Build') {
             steps {
@@ -28,22 +27,16 @@ pipeline {
         }
 
         stage('SonarCloud Analysis') {
-          steps {
-            withSonarQubeEnv('SonarCloud'){
-                withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
-                  bat '''
-                    curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-windows.zip
-                    tar -xf sonar-scanner.zip
-                    set PATH=%CD%\\sonar-scanner-5.0.1.3006-windows\\bin;%PATH%
-                    sonar-scanner.bat -D"sonar.login=%SONAR_TOKEN%"
-                  '''
+            steps {
+                withSonarQubeEnv('SonarCloud') {
+                    withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+                        bat 'curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-windows.zip'
+                        bat 'powershell -Command "Expand-Archive sonar-scanner.zip -DestinationPath ."'
+                        bat 'set PATH=%CD%\\sonar-scanner-5.0.1.3006-windows\\bin;%PATH% && sonar-scanner.bat -D"sonar.login=%SONAR_TOKEN%"'
+                    }
                 }
-              }
             }
         }
-    
-
-
 
         stage('Quality Gate') {
             steps {
@@ -52,18 +45,12 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Security') {
             steps {
                 echo 'Running `npm audit` to scan for known vulnerabilities…'
-
-                bat '''
-                  npm audit --json > audit-report.json
-                '''
-
-                bat '''
-                  npm audit --audit-level=high
-                '''
+                bat "npm audit --json > audit-report.json"
+                bat "npm audit --audit-level=high"
             }
             post {
                 always {
@@ -76,16 +63,9 @@ pipeline {
             steps {
                 echo 'Building Docker image and running container as a test deployment…'
                 script {
-                    bat """
-                      docker build -t task-manager:${BUILD_NUMBER} .
-                    """
+                    bat "docker build -t task-manager:${BUILD_NUMBER} ."
 
-                    bat """
-                      powershell -Command "if (docker ps -q --filter \"name=task-manager-test\") {
-                                            docker stop task-manager-test
-                                            docker rm  task-manager-test
-                                          }"
-                    """
+                    bat 'powershell -Command "if (docker ps -q --filter \\"name=task-manager-test\\") { docker stop task-manager-test; docker rm task-manager-test }"'
 
                     bat """
                       docker run -d ^
@@ -94,14 +74,10 @@ pipeline {
                         task-manager:${BUILD_NUMBER}
                     """
 
-                    bat """
-                      ping 127.0.0.1 -n 5 >nul
-                      curl -f http://localhost:3000/tasks || exit 1
-                    """
+                    bat "ping 127.0.0.1 -n 5 >nul"
+                    bat "curl -f http://localhost:3000/tasks || exit 1"
                 }
             }
         }
-    
+    }
 }
-
-
