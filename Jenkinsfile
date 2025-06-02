@@ -5,7 +5,7 @@ pipeline {
         SONAR_TOKEN = credentials('SONAR_TOKEN')
         DOCKERHUB_CRED    = 'dockerhub-creds'
         MONITOR_RECIPIENT = 'jack.spiers00@gmail.com' 
-        DATADOG_API_KEY = credentials('DD_APIKEY')
+        DATADOG_API_KEY = credentials('API_KEYDD')
         DATADOG_APP_KEY = credentials('DDAPPKEY')
 
     }
