@@ -141,5 +141,5 @@ pipeline {
             bat "docker rm -f task-manager-test || exit 0"
         }
     }
-
+    }
 }
