@@ -30,6 +30,13 @@ pipeline {
                 bat 'npm test'
             }
         }
+        
+        stage('Unzip Sonar Scanner') {
+            steps {
+                bat 'powershell -Command "Expand-Archive sonar-scanner.zip -DestinationPath . -Force"'
+            }
+        }
+
 
         stage('Code Quality SonarCloud Analysis') {
             steps {
