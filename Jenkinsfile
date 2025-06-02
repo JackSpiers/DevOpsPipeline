@@ -110,15 +110,10 @@ pipeline {
         stage('Monitoring') {
             steps {
                 echo 'Running health check against http://localhost:3000/health ...'
-                script {
-
-                    def statusCode = bat(returnStdout: true, script: 'curl -s -o nul -w "%{http_code}" http://localhost:3000/health').trim()
-                    echo "Health check HTTP status = ${statusCode}"
-
-                    if (statusCode != '200') {
-                        error "Health check failed (status ${statusCode})"
-                    }
-                }
+                bat '''
+                curl -s -o nul -w "%{http_code}" http://localhost:3000/health | findstr 200 > nul
+                if errorlevel 1 exit 1
+                '''
             }
             post {
                 failure {
@@ -139,7 +134,6 @@ pipeline {
                 }
             }
         }
-    }
 
     post {
         always {
