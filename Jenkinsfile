@@ -105,5 +105,45 @@ pipeline {
             }
         }
 
+        stage('Monitoring') {
+            steps {
+                echo 'Running health check against http://localhost:3000/health ...'
+                script {
+
+                    def statusCode = bat(returnStdout: true, script: 'curl -s -o nul -w "%{http_code}" http://localhost:3000/health').trim()
+                    echo "Health check HTTP status = ${statusCode}"
+
+                    if (statusCode != '200') {
+                        error "Health check failed (status ${statusCode})"
+                    }
+                }
+            }
+            post {
+                failure {
+                    echo "Health check FAILED – sending alert e-mail to ${env.MONITOR_RECIPIENT}"
+                    emailext(
+                        to: "${env.MONITOR_RECIPIENT}",
+                        subject: "ALERT: Task Manager health check failed at Build #${env.BUILD_NUMBER}",
+                        body: """\
+                        <p><b>Health check failure</b></p>
+                        <p>The pipeline’s Monitoring stage detected that <code>http://localhost:3000/health</code> returned a non-200 status.</p>
+                        <p>Build: <a href="${env.BUILD_URL}">${env.JOB_NAME} #${env.BUILD_NUMBER}</a></p>
+                        <p>Please investigate the container logs for more details.</p>
+                        """
+                    )
+                }
+                success {
+                    echo "Health check passed."
+                }
+            }
+        }
     }
+
+    post {
+        always {
+            echo "Cleaning up Docker container if it’s still running..."
+            bat "docker rm -f task-manager-test || exit 0"
+        }
+    }
+
 }
