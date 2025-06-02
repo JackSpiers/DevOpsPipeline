@@ -51,6 +51,25 @@ pipeline {
                 }
             }
         }
+        
+        stage('Security') {
+            steps {
+                echo 'Running `npm audit` to scan for known vulnerabilities…'
+
+                bat '''
+                  npm audit --json > audit-report.json
+                '''
+
+                bat '''
+                  npm audit --audit-level=high
+                '''
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'audit-report.json', fingerprint: true
+                }
+            }
+        }
     }
 }
 
