@@ -29,11 +29,13 @@ pipeline {
         stage('SonarCloud Analysis') {
             steps {
                 withSonarQubeEnv('SonarCloud') {
-                    script {
-                        def scannerHome = tool 'SonarScanner'
-                        bat "\"${scannerHome}\\bin\\sonar-scanner.bat\""
-                    }
+                    def scannerHome = tool 'SonarScanner'
+                    echo "SonarScanner path: ${scannerHome}"
+                    bat "where sonar-scanner"
+                    bat "dir \"${scannerHome}\\bin\""
+                    bat "\"${scannerHome}\\bin\\sonar-scanner.bat\" -h"
                 }
+
             }
         }
 
