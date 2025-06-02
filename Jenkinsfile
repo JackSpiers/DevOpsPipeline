@@ -117,6 +117,7 @@ pipeline {
                 curl -s -o nul -w "%{http_code}" http://localhost:3000/health | findstr 200 > nul
                 if errorlevel 1 exit 1
                 '''
+
             }
             post {
                 success {
