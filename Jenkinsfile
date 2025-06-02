@@ -144,7 +144,7 @@ pipeline {
                             -H "DD-API-KEY: ${env.DATADOG_API_KEY}" ^
                             -H "DD-APPLICATION-KEY: ${env.DATADOG_APP_KEY}" ^
                             -d @dd_event.json ^
-                            "https://api.datadoghq.com/api/v1/events"
+                            "https://api.us5.datadoghq.com/api/v1/events"
                         """
                     }
                 }
