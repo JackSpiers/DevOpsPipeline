@@ -5,8 +5,9 @@ pipeline {
         SONAR_TOKEN = credentials('SONAR_TOKEN')
         DOCKERHUB_CRED    = 'dockerhub-creds'
         MONITOR_RECIPIENT = 'jack.spiers00@gmail.com' 
-        DD_APIKEY = 'API_KEYDD'
-        DD_APPKEY = 'DDAPPKEY'
+        DATADOG_API_KEY = credentials('DD_APIKEY')
+        DATADOG_APP_KEY = credentials('DDAPPKEY')
+
     }
 
     stages {
@@ -134,8 +135,8 @@ pipeline {
                         bat """
                           curl -X POST ^
                             -H "Content-type: application/json" ^
-                            -H "DD_APIKEY: ${env.DATADOG_API_KEY}" ^
-                            -H "DD_KEY: ${env.DATADOG_APP_KEY}" ^
+                            -H "DD-API-KEY: ${env.DATADOG_API_KEY}" ^
+                            -H "DD-APPLICATION-KEY: ${env.DATADOG_APP_KEY}" ^
                             -d @dd_event.json ^
                             "https://api.datadoghq.com/api/v1/events"
                         """
